@@ -1,13 +1,11 @@
-
-
-
-
-
-
 import React, { useState } from "react";
-import { FlatList, SafeAreaView, View, StatusBar, StyleSheet, Text, TouchableOpacity, Linking, Button } from "react-native";
+import { FlatList, SafeAreaView, View, StatusBar, StyleSheet, Text, TouchableHighlight, TouchableOpacity, Linking, Button, Modal } from "react-native";
 
 import { NativeRouter, Route, Link } from "react-router-native";
+
+import { Icon } from 'react-native-elements'
+
+
 
 const DATA = [
   {
@@ -120,11 +118,12 @@ const App = () => (
       </View>
       <Route exact path="/" component={Home} />
       <Route path="/link" component={About} />
+
     </View>
+    <AddCategoryModal />
+
   </NativeRouter>
 );
-
-
 
 
 const LinkItem = ({ item, onPress, style }) => (
@@ -212,6 +211,46 @@ const LinkCategories = () => {
 
 
 
+
+const AddCategoryModal = () => {
+  const [modalVisible, setModalVisible] = useState(false);
+  return (
+    <View style={styles.centeredView}>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          Alert.alert("Modal has been closed.");
+        }}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalText}>Hello World!</Text>
+
+            <TouchableHighlight
+              style={{ ...styles.openButton, backgroundColor: "#2196F3" }}
+              onPress={() => {
+                setModalVisible(!modalVisible);
+              }}
+            >
+              <Text style={styles.textStyle}>Hide Modal</Text>
+            </TouchableHighlight>
+          </View>
+        </View>
+      </Modal>
+      
+
+      
+        <Icon name='add-circle-outline' 
+          onPress={() => {
+            setModalVisible(true);
+          }} size={40} />
+      
+    </View>
+  );
+};
+
 const styles = StyleSheet.create({
   container: {
     marginTop: 25,
@@ -245,6 +284,41 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
   },
+  centeredView: {
+    justifyContent: "flex-end",
+    alignItems: "center",
+    marginBottom: 22
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 35,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5
+  },
+  openButton: {
+    backgroundColor: "#F194FF",
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2
+  },
+  textStyle: {
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center"
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: "center"
+  }
 });
 
 export default App;
