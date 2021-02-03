@@ -235,7 +235,7 @@ const Input = ({setModalVisible}) => {
       style={{ ...styles.openButton, backgroundColor: "#2196F3" }}
       onPress={() => {
         DATA.push({
-          id: DATA.length + 1,
+          id: `${DATA.length + 1}`,
           title: value,
         })
         setModalVisible(false);
