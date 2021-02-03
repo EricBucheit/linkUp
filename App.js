@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { FlatList, SafeAreaView, View, StatusBar, StyleSheet, Text, TouchableHighlight, TouchableOpacity, Linking, Button, Modal } from "react-native";
+import { TextInput } from 'react-native';
 
 import { NativeRouter, Route, Link } from "react-router-native";
 
@@ -11,38 +12,6 @@ const DATA = [
   {
     id: "1",
     title: "First Item",
-  },
-  {
-    id: "2",
-    title: "Second Item",
-  },
-  {
-    id: "3",
-    title: "Third Item",
-  },
-  {
-    id: "4",
-    title: "First Item",
-  },
-  {
-    id: "5",
-    title: "Second Item",
-  },
-  {
-    id: "6",
-    title: "Third Item",
-  },
-  {
-    id: "7",
-    title: "First Item",
-  },
-  {
-    id: "8",
-    title: "Second Item",
-  },
-  {
-    id: "9",
-    title: "Third Item",
   },
 ];
 
@@ -226,8 +195,8 @@ const AddCategoryModal = () => {
       >
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
-            <Text style={styles.modalText}>Hello World!</Text>
-
+           <Input setModalVisible={setModalVisible}/>
+              <View style={styles.modalButtonWrapper}>
             <TouchableHighlight
               style={{ ...styles.openButton, backgroundColor: "#2196F3" }}
               onPress={() => {
@@ -236,12 +205,11 @@ const AddCategoryModal = () => {
             >
               <Text style={styles.textStyle}>Hide Modal</Text>
             </TouchableHighlight>
+
+            </View>
           </View>
         </View>
       </Modal>
-      
-
-      
         <Icon name='add-circle-outline' 
           onPress={() => {
             setModalVisible(true);
@@ -250,6 +218,34 @@ const AddCategoryModal = () => {
     </View>
   );
 };
+
+
+const Input = ({setModalVisible}) => {
+  const [value, onChangeText] = React.useState('');
+
+  return (
+    <View>
+    <TextInput
+      style={{ height: 40, width: 200, borderColor: 'gray', borderWidth: 1 }}
+      onChangeText={text => onChangeText(text)}
+      value={value}
+    />
+
+    <TouchableHighlight
+      style={{ ...styles.openButton, backgroundColor: "#2196F3" }}
+      onPress={() => {
+        DATA.push({
+          id: DATA.length + 1,
+          title: value,
+        })
+        setModalVisible(false);
+      }}
+    >
+      <Text style={styles.textStyle}>Add</Text>
+    </TouchableHighlight>
+    </View>
+  );
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -285,8 +281,8 @@ const styles = StyleSheet.create({
     fontSize: 32,
   },
   centeredView: {
-    justifyContent: "flex-end",
-    alignItems: "center",
+    // justifyContent: "flex-end",
+    // alignItems: "center",
     marginBottom: 22
   },
   modalView: {
@@ -304,7 +300,12 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5
   },
+  modalButtonWrapper: {
+    display: "flex",
+    flexDirection: "column",
+  },
   openButton: {
+
     backgroundColor: "#F194FF",
     borderRadius: 20,
     padding: 10,
