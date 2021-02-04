@@ -72,12 +72,56 @@ return (
 
 const LinkItem = ({ item, onPress, style }) => {
   let [showButton, setShowButton] = React.useState(true);
+
+
+  const [showEditModal, setShowEditModal] = React.useState(false);
+  var swipeoutBtns = [
+    // {
+    //   text: 'Edit',
+    //   onPress: function() {
+    //     setShowEditModal(true)
+    //   },
+    // },
+    {
+      text: 'Delete',
+      onPress: function() {
+        for(let category in data) {
+          if (data[category].id === item.id) {
+            data.splice(category, 1);
+            data = data.slice();
+            setData(data);
+            storeData(data);
+          }
+        }
+      }
+    }
+  ]
   return (
-    <TouchableOpacity onPress={onPress} style={[styles.item, style]}>
-      {showButton && <Button color= {"white"} title={item.name} onPress={ ()=>{ Linking.openURL(item.link)}} />}
-      <RNUrlPreview descriptionStyle={{color:"white"}} text={`${item.name} , ${item.link}`} onLoad={() => {setShowButton(false)}}/>
-    </TouchableOpacity>
-  )
+    <Swipeout right={swipeoutBtns}>
+      <View>
+         <Link
+          to="/link"
+          
+          onPress={onPress}
+        >
+          <React.Fragment>
+            {showButton && <Button color= {"white"} title={item.name} onPress={ ()=>{ Linking.openURL(item.link)}} />}
+            <RNUrlPreview descriptionStyle={{color:"white"}} text={`${item.name} , ${item.link}`} onLoad={() => {setShowButton(false)}}/>
+          </React.Fragment>
+        </Link>
+      </View>
+    </Swipeout>
+    )
+
+
+
+
+  // return (
+  //   <TouchableOpacity onPress={onPress} style={[styles.item, style]}>
+  //     {showButton && <Button color= {"white"} title={item.name} onPress={ ()=>{ Linking.openURL(item.link)}} />}
+  //     <RNUrlPreview descriptionStyle={{color:"white"}} text={`${item.name} , ${item.link}`} onLoad={() => {setShowButton(false)}}/>
+  //   </TouchableOpacity>
+  // )
 };
 
 const Links = ({currentCategory, setData, data}) => {
@@ -171,9 +215,6 @@ const AddLinkInput = ({setModalVisible, currentCategory, setData, data}) => {
     <TouchableHighlight
       style={{ ...styles.openButton, backgroundColor: "white" }}
       onPress={() => {
-        
-
-
         currentCategory.links.push({
           id: `${currentCategory.links.length + 1}`,
           name: name,
