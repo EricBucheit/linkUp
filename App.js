@@ -29,7 +29,7 @@ const getData = async () => {
 }
 
 
-const Home = ({currentCategory, setCurrentCategory, data, setData}) => <LinkCategories setData={setData} data={data} setCurrentCategory={setCurrentCategory} />;
+const Home = ({currentCategory, setCurrentCategory, data, setData}) => <Categories setData={setData} data={data} setCurrentCategory={setCurrentCategory} />;
 
 const LinkPage = ({currentCategory, setCurrentCategory, data, setData}) => <Links data={data} setData={setData} setCurrentCategory={setCurrentCategory} currentCategory={currentCategory}/>;
 
@@ -194,16 +194,28 @@ const AddLinkInput = ({setModalVisible, currentCategory, setData, data}) => {
 }
 
 
-const Item = ({ item, onPress, style }) => {
+const Item = ({ item, onPress, style, setData, data }) => {
+  const [showEditModal, setShowEditModal] = React.useState(false);
   var swipeoutBtns = [
     {
       text: 'Edit',
       onPress: function() {
-        console.log()
+        setShowEditModal(true)
       },
     },
     {
-      text: 'Delete'
+      text: 'Delete',
+      onPress: function() {
+        for(let category in data) {
+          if (data[category].id === item.id) {
+            data.splice(category, 1);
+            data = data.slice();
+            setData(data);
+            storeData(data);
+
+          }
+        }
+      }
     }
   ]
   return (
@@ -217,14 +229,16 @@ const Item = ({ item, onPress, style }) => {
         >
           <Text style={styles.title}>{item.title}</Text>
         </Link>
+        <EditCategoryModal modalVisible={showEditModal} setModalVisible={setShowEditModal} setData={setData} data={data} item={item}/>
       </View>
     </Swipeout>
    
   )
 }
 
-const LinkCategories = ({setCurrentCategory, data, setData}) => {
+const Categories = ({setCurrentCategory, data, setData}) => {
   const [selectedId, setSelectedId] = useState(null);
+
   const renderItem = ({ item }) => {
     const backgroundColor = item.id === selectedId ? "white" : "white";
     return (
@@ -233,6 +247,8 @@ const LinkCategories = ({setCurrentCategory, data, setData}) => {
         onPress={() => {
           setCurrentCategory(item)
         }}
+        data={data}
+        setData={setData}
         style={{ backgroundColor }}
       />
     );
@@ -246,11 +262,44 @@ const LinkCategories = ({setCurrentCategory, data, setData}) => {
         keyExtractor={(item) => item.id}
         extraData={selectedId}
       />
-
+      
       <AddCategoryModal setData={setData} data={data} setData={setData}/>
     </SafeAreaView>
   );
 };
+
+const EditCategoryModal = ({modalVisible, setModalVisible, setData, data, item}) => {
+  return (
+    <View style={styles.centeredView}>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          Alert.alert("Modal has been closed.");
+        }}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+           <EditCategoryInput data={data} setData={setData} setModalVisible={setModalVisible} item={item}/>
+              <View style={styles.modalButtonWrapper}>
+                <TouchableHighlight
+                  style={{ ...styles.openButton, backgroundColor: "#2196F3" }}
+                  onPress={() => {
+                    setModalVisible(!modalVisible);
+                  }}
+                >
+              <Text style={styles.textStyle}>Hide Modal</Text>
+            </TouchableHighlight>
+
+            </View>
+          </View>
+        </View>
+      </Modal>
+    </View>
+  );
+};
+
 
 const AddCategoryModal = ({setData, data}) => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -290,6 +339,39 @@ const AddCategoryModal = ({setData, data}) => {
   );
 };
 
+const EditCategoryInput = ({setModalVisible, data, setData, item}) => {
+  const [value, onChangeText] = React.useState('');
+  return (
+    <View>
+    <TextInput
+      style={{ height: 40, width: 200, borderColor: 'gray', borderWidth: 1 }}
+      onChangeText={text => onChangeText(text)}
+      value={value}
+    />
+
+    <TouchableHighlight
+      style={{ ...styles.openButton, backgroundColor: "#2196F3" }}
+      onPress={() => {
+        for (let category of data) {
+          if (category.id === item.id) {
+            category.title = value
+            break ;
+          }
+        }
+
+        data = data.slice();
+        setData(data);
+        storeData(data);
+        if (setModalVisible) {
+          setModalVisible(false);
+        }
+      }}
+    >
+      <Text style={styles.textStyle}>Save</Text>
+    </TouchableHighlight>
+    </View>
+  );
+}
 
 const Input = ({setModalVisible, data, setData}) => {
   const [value, onChangeText] = React.useState('');
