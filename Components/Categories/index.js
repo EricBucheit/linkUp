@@ -1,11 +1,10 @@
 import React, { useState } from "react";
-import { FlatList, SafeAreaView, View, StatusBar, Image, StyleSheet, Text, TouchableHighlight, TouchableOpacity, Linking, Button, Modal } from "react-native";
+import { FlatList, SafeAreaView, View, StyleSheet, Text, TouchableHighlight, Modal } from "react-native";
 import { TextInput } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Swipeout from 'react-native-swipeout';
 
-import { NativeRouter, Route, Link } from "react-router-native";
-import RNUrlPreview from 'react-native-url-preview';
+import { Link } from "react-router-native";
 
 import { Icon } from 'react-native-elements'
 
@@ -15,16 +14,6 @@ const storeData = async (value) => {
     await AsyncStorage.setItem('linkData', jsonValue)
   } catch (e) {
     // saving error
-  }
-}
-
-const getData = async () => {
-  try {
-    const jsonValue = await AsyncStorage.getItem('linkData')
-    console.log(jsonValue)
-    return jsonValue != null ? JSON.parse(jsonValue) : [];
-  } catch(e) {
-    // error reading value
   }
 }
 
@@ -63,18 +52,36 @@ const Category = ({ item, onPress, style, setData, data }) => {
         >
           <Text style={styles.title}>{item.title}</Text>
         </Link>
-        <EditCategoryModal modalVisible={showEditModal} setModalVisible={setShowEditModal} setData={setData} data={data} item={item}/>
+        <AModal modalVisible={showEditModal} setModalVisible={setShowEditModal} showButton={false}>
+          <Input 
+           onSubmit={(value) => {
+                for (let category of data) {
+                  if (category.id === item.id) {
+                    category.title = value
+                    break ;
+                  }
+                }
+
+                data = data.slice();
+                setData(data);
+                storeData(data);
+                setShowEditModal(false);
+            }}
+            
+        />
+        </AModal>
       </View>
     </Swipeout>
    
   )
 }
 
+
 const Categories = ({setCurrentCategory, data, setData}) => {
-  const [selectedId, setSelectedId] = useState(null);
+  const [modalVisible, setModalVisible] = React.useState(false);
 
   const renderItem = ({ item }) => {
-    const backgroundColor = item.id === selectedId ? "white" : "white";
+    const backgroundColor = "white";
     return (
       <Category
         item={item}
@@ -94,15 +101,28 @@ const Categories = ({setCurrentCategory, data, setData}) => {
         data={data}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
-        extraData={selectedId}
-      />
-      
-      <AddCategoryModal setData={setData} data={data} setData={setData}/>
+      />  
+      <AModal modalVisible={modalVisible} setModalVisible={setModalVisible} showButton={true}>
+         <Input 
+           onSubmit={(value) => {
+              data.push({
+                id: `${data.length + 1}`,
+                title: value,
+                links: [],
+              })
+              data = data.slice();
+              setData(data);
+              storeData(data);
+              setModalVisible(false);
+            }}
+        />
+      </AModal>
     </SafeAreaView>
   );
 };
 
-const EditCategoryModal = ({modalVisible, setModalVisible, setData, data, item}) => {
+
+const AModal = ({modalVisible, setModalVisible, showButton, children}) => {
   return (
     <View style={styles.centeredView}>
       <Modal
@@ -110,46 +130,14 @@ const EditCategoryModal = ({modalVisible, setModalVisible, setData, data, item})
         transparent={true}
         visible={modalVisible}
         onRequestClose={() => {
-          Alert.alert("Modal has been closed.");
+          // Alert.alert("Modal has been closed.");
         }}
       >
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
-           <EditCategoryInput data={data} setData={setData} setModalVisible={setModalVisible} item={item}/>
-              <View style={styles.modalButtonWrapper}>
-                <TouchableHighlight
-                  style={{ ...styles.openButton, backgroundColor: "#2196F3" }}
-                  onPress={() => {
-                    setModalVisible(!modalVisible);
-                  }}
-                >
-              <Text style={styles.textStyle}>Hide Modal</Text>
-            </TouchableHighlight>
+           
+           {children}
 
-            </View>
-          </View>
-        </View>
-      </Modal>
-    </View>
-  );
-};
-
-
-const AddCategoryModal = ({setData, data}) => {
-  const [modalVisible, setModalVisible] = useState(false);
-  return (
-    <View style={styles.centeredView}>
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => {
-          Alert.alert("Modal has been closed.");
-        }}
-      >
-        <View style={styles.centeredView}>
-          <View style={styles.modalView}>
-           <Input data={data} setData={setData} setModalVisible={setModalVisible}/>
               <View style={styles.modalButtonWrapper}>
             <TouchableHighlight
               style={{ ...styles.openButton, backgroundColor: "#2196F3" }}
@@ -159,21 +147,23 @@ const AddCategoryModal = ({setData, data}) => {
             >
               <Text style={styles.textStyle}>Hide Modal</Text>
             </TouchableHighlight>
-
             </View>
           </View>
         </View>
       </Modal>
+      {showButton && 
         <Icon name='add-circle-outline' 
           onPress={() => {
             setModalVisible(true);
-          }} size={40} />
+          }} size={40} 
+        />
+      }
       
     </View>
   );
 };
 
-const EditCategoryInput = ({setModalVisible, data, setData, item}) => {
+const Input = ({onSubmit}) => {
   const [value, onChangeText] = React.useState('');
   return (
     <View>
@@ -185,54 +175,7 @@ const EditCategoryInput = ({setModalVisible, data, setData, item}) => {
 
     <TouchableHighlight
       style={{ ...styles.openButton, backgroundColor: "#2196F3" }}
-      onPress={() => {
-        for (let category of data) {
-          if (category.id === item.id) {
-            category.title = value
-            break ;
-          }
-        }
-
-        data = data.slice();
-        setData(data);
-        storeData(data);
-        if (setModalVisible) {
-          setModalVisible(false);
-        }
-      }}
-    >
-      <Text style={styles.textStyle}>Save</Text>
-    </TouchableHighlight>
-    </View>
-  );
-}
-
-const Input = ({setModalVisible, data, setData}) => {
-  const [value, onChangeText] = React.useState('');
-  return (
-    <View>
-    <TextInput
-      style={{ height: 40, width: 200, borderColor: 'gray', borderWidth: 1 }}
-      onChangeText={text => onChangeText(text)}
-      value={value}
-    />
-
-    <TouchableHighlight
-      style={{ ...styles.openButton, backgroundColor: "#2196F3" }}
-      onPress={() => {
-        
-        data.push({
-          id: `${data.length + 1}`,
-          title: value,
-          links: [],
-        })
-        data = data.slice();
-        setData(data);
-        storeData(data);
-        if (setModalVisible) {
-          setModalVisible(false);
-        }
-      }}
+      onPress={() => onSubmit(value)}
     >
       <Text style={styles.textStyle}>Add</Text>
     </TouchableHighlight>
