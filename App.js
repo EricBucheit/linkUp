@@ -38,7 +38,7 @@ let [currentCategory, setCurrentCategory] = React.useState({})
 let [data, setData] = React.useState([]);
 
 React.useEffect(async () => {
-    setData( await getData());
+    setData(await getData());
     return () => {
       console.log("This will be logged on unmount");
     }
@@ -69,17 +69,20 @@ return (
 };
 
 
-const LinkItem = ({ item, onPress, style }) => (
-  <TouchableOpacity onPress={onPress} style={[styles.item, style]}>
-    <RNUrlPreview text={`${item.name} , ${item.link}`}/>
-    <Button title={item.name} onPress={ ()=>{ Linking.openURL(item.link)}} />
-  </TouchableOpacity>
-);
+const LinkItem = ({ item, onPress, style }) => {
+  let [showButton, setShowButton] = React.useState(true);
+  return (
+    <TouchableOpacity onPress={onPress} style={[styles.item, style]}>
+      {showButton && <Button color= {"white"} title={item.name} onPress={ ()=>{ Linking.openURL(item.link)}} />}
+      <RNUrlPreview descriptionStyle={{color:"white"}} text={`${item.name} , ${item.link}`} onLoad={() => {setShowButton(false)}}/>
+    </TouchableOpacity>
+  )
+};
 
 const Links = ({currentCategory, setData, data}) => {
   const [selectedId, setSelectedId] = useState(null);
   const renderItem = ({ item }) => {
-    const backgroundColor = item.id === selectedId ? "#6e3b6e" : "#f9c2ff";
+    const backgroundColor = item.id === selectedId ? "black" : "black";
     return (
       <LinkItem
         item={item}
@@ -125,7 +128,7 @@ const AddLinkModal = ({currentCategory, setData, data}) => {
            <AddLinkInput setData={setData} data={data} currentCategory={currentCategory} setModalVisible={setModalVisible}/>
               <View style={styles.modalButtonWrapper}>
             <TouchableHighlight
-              style={{ ...styles.openButton, backgroundColor: "#2196F3" }}
+              style={{ ...styles.openButton, backgroundColor: "white" }}
               onPress={() => {
                 setModalVisible(!modalVisible);
               }}
@@ -166,7 +169,7 @@ const AddLinkInput = ({setModalVisible, currentCategory, setData, data}) => {
     />
 
     <TouchableHighlight
-      style={{ ...styles.openButton, backgroundColor: "#2196F3" }}
+      style={{ ...styles.openButton, backgroundColor: "white" }}
       onPress={() => {
         
 
@@ -207,7 +210,7 @@ const Item = ({ item, onPress, style }) => (
 const LinkCategories = ({setCurrentCategory, data, setData}) => {
   const [selectedId, setSelectedId] = useState(null);
   const renderItem = ({ item }) => {
-    const backgroundColor = item.id === selectedId ? "#6e3b6e" : "#f9c2ff";
+    const backgroundColor = item.id === selectedId ? "white" : "white";
     return (
       <Item
         item={item}
@@ -314,6 +317,7 @@ const styles = StyleSheet.create({
     padding: 20,
     marginVertical: 8,
     marginHorizontal: 16,
+    borderRadius: 5,
   },
   header: {
     fontSize: 20
@@ -362,8 +366,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
   },
   openButton: {
-
-    backgroundColor: "#F194FF",
+    backgroundColor: "white",
     borderRadius: 20,
     padding: 10,
     elevation: 2
