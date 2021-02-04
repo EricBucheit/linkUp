@@ -1,46 +1,31 @@
 import React, { useState } from "react";
-import { FlatList, SafeAreaView, View, StatusBar, StyleSheet, Text, TouchableHighlight, TouchableOpacity, Linking, Button, Modal } from "react-native";
+import { FlatList, SafeAreaView, View, StatusBar, Image, StyleSheet, Text, TouchableHighlight, TouchableOpacity, Linking, Button, Modal } from "react-native";
 import { TextInput } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { NativeRouter, Route, Link } from "react-router-native";
+import RNUrlPreview from 'react-native-url-preview';
 
 import { Icon } from 'react-native-elements'
 
+const storeData = async (value) => {
+  try {
+    const jsonValue = JSON.stringify(value)
+    await AsyncStorage.setItem('linkData', jsonValue)
+  } catch (e) {
+    // saving error
+  }
+}
 
-
-const DATA = [
-  {
-    id: "1",
-    title: "First Item",
-    links: [
-      {
-        id: "11",
-        name: "Google",
-        link: "http://google.com",
-      },
-      {
-        id: "12",
-        name: "Ericb",
-        link: "http://ericbucheit.com",
-      },
-      {
-        id: "13",
-        name: "REDDIT",
-        link: "http://reddit.com",
-      },
-      {
-        id: "14",
-        name: "Google",
-        link: "http://google.com",
-      },
-      {
-        id: "15",
-        name: "Google",
-        link: "http://google.com",
-      },
-    ],
-  },
-];
+const getData = async () => {
+  try {
+    const jsonValue = await AsyncStorage.getItem('linkData')
+    console.log(jsonValue)
+    return jsonValue != null ? JSON.parse(jsonValue) : [];
+  } catch(e) {
+    // error reading value
+  }
+}
 
 
 const Home = ({currentCategory, setCurrentCategory, data, setData}) => <LinkCategories setData={setData} data={data} setCurrentCategory={setCurrentCategory} />;
@@ -52,7 +37,12 @@ const App = () => {
 let [currentCategory, setCurrentCategory] = React.useState({})
 let [data, setData] = React.useState([]);
 
-
+React.useEffect(async () => {
+    setData( await getData());
+    return () => {
+      console.log("This will be logged on unmount");
+    }
+}, []);
 
 return (
   <NativeRouter>
@@ -81,6 +71,7 @@ return (
 
 const LinkItem = ({ item, onPress, style }) => (
   <TouchableOpacity onPress={onPress} style={[styles.item, style]}>
+    <RNUrlPreview text={`${item.name} , ${item.link}`}/>
     <Button title={item.name} onPress={ ()=>{ Linking.openURL(item.link)}} />
   </TouchableOpacity>
 );
@@ -157,7 +148,7 @@ const AddLinkModal = ({currentCategory, setData, data}) => {
 
 
 const AddLinkInput = ({setModalVisible, currentCategory, setData, data}) => {
-  const [url, setUrl] = React.useState('');
+  const [url, setUrl] = React.useState('https://');
   const [name, setName] = React.useState('');
   return (
     <View>
@@ -177,8 +168,9 @@ const AddLinkInput = ({setModalVisible, currentCategory, setData, data}) => {
     <TouchableHighlight
       style={{ ...styles.openButton, backgroundColor: "#2196F3" }}
       onPress={() => {
-        //needed
-        // parse url for https://
+        
+
+
         currentCategory.links.push({
           id: `${currentCategory.links.length + 1}`,
           name: name,
@@ -186,7 +178,7 @@ const AddLinkInput = ({setModalVisible, currentCategory, setData, data}) => {
         })
         data = data.slice();
         setData(data);
-
+        storeData(data);
         if (setModalVisible) {
           setModalVisible(false);
         }
@@ -300,6 +292,7 @@ const Input = ({setModalVisible, data, setData}) => {
         })
         data = data.slice();
         setData(data);
+        storeData(data);
         if (setModalVisible) {
           setModalVisible(false);
         }
