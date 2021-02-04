@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { FlatList, SafeAreaView, View, StatusBar, Image, StyleSheet, Text, TouchableHighlight, TouchableOpacity, Linking, Button, Modal } from "react-native";
 import { TextInput } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Swipeout from 'react-native-swipeout';
 
 import { NativeRouter, Route, Link } from "react-router-native";
 import RNUrlPreview from 'react-native-url-preview';
@@ -88,7 +89,6 @@ const Links = ({currentCategory, setData, data}) => {
         item={item}
         onPress={() => {
           setSelectedId(item.id)
-
         }}
         style={{ backgroundColor }}
       />
@@ -193,19 +193,35 @@ const AddLinkInput = ({setModalVisible, currentCategory, setData, data}) => {
   );
 }
 
-const Item = ({ item, onPress, style }) => (
-  
-    <Link
-      to="/link"
-      underlayColor="#f0f4f7"
-      style={[styles.item, style]}
-      onPress={onPress}
-    >
-      <Text style={styles.title}>{item.title}</Text>
-    </Link>
 
-
-);
+const Item = ({ item, onPress, style }) => {
+  var swipeoutBtns = [
+    {
+      text: 'Edit',
+      onPress: function() {
+        console.log()
+      },
+    },
+    {
+      text: 'Delete'
+    }
+  ]
+  return (
+    <Swipeout right={swipeoutBtns}>
+      <View>
+         <Link
+          to="/link"
+          underlayColor="#f0f4f7"
+          style={[styles.item, style]}
+          onPress={onPress}
+        >
+          <Text style={styles.title}>{item.title}</Text>
+        </Link>
+      </View>
+    </Swipeout>
+   
+  )
+}
 
 const LinkCategories = ({setCurrentCategory, data, setData}) => {
   const [selectedId, setSelectedId] = useState(null);
@@ -230,6 +246,7 @@ const LinkCategories = ({setCurrentCategory, data, setData}) => {
         keyExtractor={(item) => item.id}
         extraData={selectedId}
       />
+
       <AddCategoryModal setData={setData} data={data} setData={setData}/>
     </SafeAreaView>
   );
