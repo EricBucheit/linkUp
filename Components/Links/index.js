@@ -24,6 +24,8 @@ const UrlLink = ({ item, onPress, style, currentCategory, data, setData }) => {
 
   var swipeoutBtns = [
     {
+      color: "black",
+      backgroundColor: "yellow",
       text: 'Edit',
       onPress: function() {
         setShowEditModal(true)
@@ -31,6 +33,8 @@ const UrlLink = ({ item, onPress, style, currentCategory, data, setData }) => {
     },
     {
       text: 'Delete',
+      color: "black",
+      backgroundColor: "red",
       onPress: function() {
         let links = currentCategory.links;
         for (let link in links){
@@ -46,22 +50,25 @@ const UrlLink = ({ item, onPress, style, currentCategory, data, setData }) => {
     }
   ]
   return (
-    <Swipeout right={swipeoutBtns}>
+    <Swipeout style={{backgroundColor: "black", borderRadius: 10, marginBottom: 10, height: 120}} right={swipeoutBtns}>
        <View style={{
-          borderBottomColor: "#e8e8e8",
-          borderBottomWidth: 1,
-          marginBottom: 5
+          // borderBottomColor: "#e8e8e8",
+          // borderBottomWidth: 1,
+          // marginBottom: 5
         }}>
          <Link
           to="/link" 
           onPress={onPress}
         >
           <React.Fragment>
-            {showButton && <Button color= {"white"} title={item.name} onPress={ ()=>{ Linking.openURL(item.link)}} />}
-            <RNUrlPreview descriptionStyle={{color:"white"}} text={`${item.name} , ${item.link}`} onLoad={() => {setShowButton(false)}}/>
+          <View style={{flexDirection: "row", justifyContent: "center"}}>
+            {showButton && <Button style={{justifyContent: "flex-start"}} color= {"white"} title={item.name} onPress={ ()=>{ Linking.openURL(item.link)}} />}
+          </View>
+            <RNUrlPreview descriptionStyle={{color:"white"}} titleStyle={{fontSize:20, color:"white"}} text={`${item.name} , ${item.link}`} onLoad={() => {setShowButton(false)}}/>
           </React.Fragment>
         </Link>
-       <LinkModal currentCategory={currentCategory} setModalVisible={setShowEditModal} modalVisible={showEditModal} showButton={false}>
+       
+        <LinkModal currentCategory={currentCategory} setModalVisible={setShowEditModal} modalVisible={showEditModal} showButton={false}>
            <Input
               title={"Edit"}
               onSubmit={(url, name) => {
@@ -79,7 +86,7 @@ const UrlLink = ({ item, onPress, style, currentCategory, data, setData }) => {
                   setShowEditModal(false);
               }}
            />
-      </LinkModal>
+        </LinkModal>
       </View>
 
 
@@ -109,7 +116,6 @@ const Links = ({currentCategory, setData, data}) => {
 
   return (
     <SafeAreaView style={styles.container}>
-    <Text> Links </Text>
       <FlatList
         data={currentCategory.links}
         renderItem={renderItem}
@@ -166,14 +172,17 @@ const LinkModal = ({currentCategory, setModalVisible, modalVisible, children, sh
           </View>
         </View>
       </Modal>
+        <View style={{backgroundColor:"green", borderRadius: 10}}>
         {showButton && 
           <Icon 
-            name='add-circle-outline' 
+            name='add-circle'
+            style={{padding: 20}}
             onPress={() => {
-              setModalVisible(true);
+              setModalVisible(!modalVisible);
             }} size={40} 
           />
         }
+      </View>
       
     </View>
   );
