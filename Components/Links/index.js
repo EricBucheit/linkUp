@@ -18,38 +18,28 @@ const storeData = async (value) => {
   }
 }
 
-const getData = async () => {
-  try {
-    const jsonValue = await AsyncStorage.getItem('linkData')
-    console.log(jsonValue)
-    return jsonValue != null ? JSON.parse(jsonValue) : [];
-  } catch(e) {
-    // error reading value
-  }
-}
-
-
-const UrlLink = ({ item, onPress, style }) => {
+const UrlLink = ({ item, onPress, style, currentCategory, data, setData }) => {
   let [showButton, setShowButton] = React.useState(true);
-
-
   const [showEditModal, setShowEditModal] = React.useState(false);
+
   var swipeoutBtns = [
-    // {
-    //   text: 'Edit',
-    //   onPress: function() {
-    //     setShowEditModal(true)
-    //   },
-    // },
+    {
+      text: 'Edit',
+      onPress: function() {
+        setShowEditModal(true)
+      },
+    },
     {
       text: 'Delete',
       onPress: function() {
-        for(let category in data) {
-          if (data[category].id === item.id) {
-            data.splice(category, 1);
+        let links = currentCategory.links;
+        for (let link in links){
+          if (links[link].id === item.id) {
+            links.splice(link, 1);
             data = data.slice();
             setData(data);
             storeData(data);
+            break ;
           }
         }
       }
@@ -61,11 +51,9 @@ const UrlLink = ({ item, onPress, style }) => {
           borderBottomColor: "#e8e8e8",
           borderBottomWidth: 1,
           marginBottom: 5
-
         }}>
          <Link
-          to="/link"
-          
+          to="/link" 
           onPress={onPress}
         >
           <React.Fragment>
@@ -73,13 +61,36 @@ const UrlLink = ({ item, onPress, style }) => {
             <RNUrlPreview descriptionStyle={{color:"white"}} text={`${item.name} , ${item.link}`} onLoad={() => {setShowButton(false)}}/>
           </React.Fragment>
         </Link>
+       <LinkModal currentCategory={currentCategory} setModalVisible={setShowEditModal} modalVisible={showEditModal} showButton={false}>
+           <Input
+              title={"Edit"}
+              onSubmit={(url, name) => {
+                  let links = currentCategory.links;
+                  for (let link of links){
+                    if (link.id === item.id) {
+                      link.link = url;
+                      link.name = name;
+                      break ;
+                    }
+                  }
+                  data = data.slice();
+                  setData(data);
+                  storeData(data);
+                  setShowEditModal(false);
+              }}
+           />
+      </LinkModal>
       </View>
+
+
     </Swipeout>
     )
 };
 
 const Links = ({currentCategory, setData, data}) => {
   const [selectedId, setSelectedId] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
+
   const renderItem = ({ item }) => {
     const backgroundColor = item.id === selectedId ? "black" : "black";
     return (
@@ -89,6 +100,9 @@ const Links = ({currentCategory, setData, data}) => {
           setSelectedId(item.id)
         }}
         style={{ backgroundColor }}
+        currentCategory={currentCategory}
+        data={data}
+        setData={setData}
       />
     );
   };
@@ -102,14 +116,29 @@ const Links = ({currentCategory, setData, data}) => {
         keyExtractor={(item) => item.id}
         extraData={selectedId}
       />
-      <AddLinkModal setData={setData} data={data} currentCategory={currentCategory}/>
+      <LinkModal currentCategory={currentCategory} setModalVisible={setModalVisible} modalVisible={modalVisible} showButton={true}>
+           <Input
+            title={"New"}
+            onSubmit={(url, name) => {
+              currentCategory.links.push({
+                id: `${currentCategory.links.length + 1}`,
+                name: name,
+                link: url,
+              })
+              data = data.slice();
+              setData(data);
+              storeData(data);
+              if (setModalVisible) {
+                setModalVisible(false);
+              }
+            }}
+           />
+      </LinkModal>
     </SafeAreaView>
   );
 };
 
-const AddLinkModal = ({currentCategory, setData, data}) => {
-  const [modalVisible, setModalVisible] = useState(false);
-
+const LinkModal = ({currentCategory, setModalVisible, modalVisible, children, showButton}) => {
   return (
     <View style={styles.centeredView}>
       <Modal
@@ -123,36 +152,40 @@ const AddLinkModal = ({currentCategory, setData, data}) => {
       >
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
-           <AddLinkInput setData={setData} data={data} currentCategory={currentCategory} setModalVisible={setModalVisible}/>
-              <View style={styles.modalButtonWrapper}>
-            <TouchableHighlight
-              style={{ ...styles.openButton, backgroundColor: "black" }}
-              onPress={() => {
-                setModalVisible(!modalVisible);
-              }}
-            >
-              <Text style={styles.textStyle}>Hide Modal</Text>
-            </TouchableHighlight>
-
+          {children}
+            <View style={styles.modalButtonWrapper}>
+                <TouchableHighlight
+                  style={{ ...styles.openButton, backgroundColor: "black" }}
+                  onPress={() => {
+                    setModalVisible(!modalVisible);
+                  }}
+                >
+                <Text style={styles.textStyle}>Hide Modal</Text>
+              </TouchableHighlight>
             </View>
           </View>
         </View>
       </Modal>
-        <Icon name='add-circle-outline' 
-          onPress={() => {
-            setModalVisible(true);
-          }} size={40} />
+        {showButton && 
+          <Icon 
+            name='add-circle-outline' 
+            onPress={() => {
+              setModalVisible(true);
+            }} size={40} 
+          />
+        }
       
     </View>
   );
 };
 
 
-const AddLinkInput = ({setModalVisible, currentCategory, setData, data}) => {
+const Input = ({onSubmit, title}) => {
   const [url, setUrl] = React.useState('https://');
   const [name, setName] = React.useState('');
   return (
     <View>
+    <Text>{title}</Text>
     <Text>Name</Text>
     <TextInput
       style={{ height: 40, width: 200, borderColor: 'gray', borderWidth: 1 }}
@@ -168,19 +201,7 @@ const AddLinkInput = ({setModalVisible, currentCategory, setData, data}) => {
 
     <TouchableHighlight
       style={{ ...styles.openButton, backgroundColor: "black" }}
-      onPress={() => {
-        currentCategory.links.push({
-          id: `${currentCategory.links.length + 1}`,
-          name: name,
-          link: url,
-        })
-        data = data.slice();
-        setData(data);
-        storeData(data);
-        if (setModalVisible) {
-          setModalVisible(false);
-        }
-      }}
+      onPress={() => onSubmit(url, name)}
     >
       <Text style={styles.textStyle}>Add</Text>
     </TouchableHighlight>
