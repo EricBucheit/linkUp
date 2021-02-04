@@ -73,10 +73,16 @@ return (
 const LinkItem = ({ item, onPress, style }) => {
   let [showButton, setShowButton] = React.useState(true);
   return (
-    <TouchableOpacity onPress={onPress} style={[styles.item, style]}>
+    
+    <View style={{
+      borderBottomColor: "#e8e8e8",
+      borderBottomWidth: '1px',
+      marginBottom: '5px'
+
+    }}>
       {showButton && <Button color= {"white"} title={item.name} onPress={ ()=>{ Linking.openURL(item.link)}} />}
-      <RNUrlPreview descriptionStyle={{color:"white"}} text={`${item.name} , ${item.link}`} onLoad={() => {setShowButton(false)}}/>
-    </TouchableOpacity>
+      <RNUrlPreview text={`${item.name} , ${item.link}`} onLoad={() => {setShowButton(false)}}/>
+    </View>
   )
 };
 
@@ -128,7 +134,7 @@ const AddLinkModal = ({currentCategory, setData, data}) => {
            <AddLinkInput setData={setData} data={data} currentCategory={currentCategory} setModalVisible={setModalVisible}/>
               <View style={styles.modalButtonWrapper}>
             <TouchableHighlight
-              style={{ ...styles.openButton, backgroundColor: "white" }}
+              style={{ ...styles.openButton, backgroundColor: "black" }}
               onPress={() => {
                 setModalVisible(!modalVisible);
               }}
@@ -169,7 +175,7 @@ const AddLinkInput = ({setModalVisible, currentCategory, setData, data}) => {
     />
 
     <TouchableHighlight
-      style={{ ...styles.openButton, backgroundColor: "white" }}
+      style={{ ...styles.openButton, backgroundColor: "black" }}
       onPress={() => {
         
 
@@ -383,7 +389,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
   },
   openButton: {
-    backgroundColor: "white",
+    backgroundColor: "black",
     borderRadius: 20,
     padding: 10,
     elevation: 2
