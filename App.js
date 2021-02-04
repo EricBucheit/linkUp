@@ -139,7 +139,7 @@ const AddLinkModal = ({currentCategory, setData, data}) => {
                 setModalVisible(!modalVisible);
               }}
             >
-              <Text style={styles.textStyle}>Hide Modal</Text>
+              <Text style={styles.textStyle}>Hide the Modal</Text>
             </TouchableHighlight>
 
             </View>
