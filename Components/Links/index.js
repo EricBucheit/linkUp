@@ -62,9 +62,9 @@ const UrlLink = ({ item, onPress, style, currentCategory, data, setData }) => {
         >
           <React.Fragment>
           <View style={{flexDirection: "row", justifyContent: "center"}}>
-            {showButton && <Button style={{justifyContent: "flex-start"}} color= {"white"} title={item.name} onPress={ ()=>{ Linking.openURL(item.link)}} />}
+            {showButton && <Button style={{justifyContent: "flex-start"}} color= {"white"} title={item.name} onPress={ ()=>{ Linking.openURL(item.url)}} />}
           </View>
-            <RNUrlPreview descriptionStyle={{color:"white"}} titleStyle={{fontSize:20, color:"white"}} text={`${item.name} , ${item.link}`} onLoad={() => {setShowButton(false)}}/>
+            <RNUrlPreview descriptionStyle={{color:"white"}} titleStyle={{fontSize:20, color:"white"}} text={`${item.name} , ${item.url}`} onLoad={() => {setShowButton(false)}}/>
           </React.Fragment>
         </Link>
        
@@ -80,7 +80,7 @@ const UrlLink = ({ item, onPress, style, currentCategory, data, setData }) => {
                   let links = currentCategory.links;
                   for (let link of links){
                     if (link.id === item.id) {
-                      link.link = url;
+                      link.url = url;
                       link.name = name;
                       break ;
                     }
@@ -141,7 +141,7 @@ const Links = ({currentCategory, setData, data}) => {
               currentCategory.links.push({
                 id: `${currentCategory.links.length + 1}`,
                 name: name,
-                link: url,
+                url: url,
               })
               data = data.slice();
               setData(data);

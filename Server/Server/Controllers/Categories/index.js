@@ -3,11 +3,12 @@ module.exports = {
 
 	async get(req, res, db) {
 		console.log("GETTING")
+		console.log(db)
 		let categories = await db.Categories.findAll({
 			where: {
 				userId: req.session.user.id,
-				// include: db.Links,
-			}
+			},
+			include: db.Links,
 		}).catch(err => console.log(err))
 
 		if (categories) {

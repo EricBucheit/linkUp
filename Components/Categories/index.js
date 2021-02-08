@@ -56,7 +56,7 @@ const Category = ({ item, onPress, style, setData, data }) => {
           onPress={onPress}
         >
         <View style={{flexDirection: "row", justifyContent: "center"}}>
-          <Text style={[styles.title, {justifyContent: "flex-start"}]}>{item.title}</Text>
+          <Text style={[styles.title, {justifyContent: "flex-start"}]}>{item.name}</Text>
         </View>
         </Link>
         <AModal modalVisible={showEditModal} setModalVisible={setShowEditModal} showButton={false}>
@@ -70,7 +70,7 @@ const Category = ({ item, onPress, style, setData, data }) => {
               })
                 for (let category of data) {
                   if (category.id === item.id) {
-                    category.title = value
+                    category.name = value
                     break ;
                   }
                 }
@@ -127,7 +127,7 @@ const Categories = ({setCurrentCategory, data, setData}) => {
 
               data.push({
                 id: `${data.length + 1}`,
-                title: value,
+                name: value,
                 links: [],
               })
               data = data.slice();

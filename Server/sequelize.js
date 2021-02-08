@@ -30,14 +30,14 @@ for (let index in Models) {
 }
 
 db.Users.hasMany(db.Categories);
-db.Categories.belongsTo(db.Users);
+// db.Categories.belongsTo(db.Users);
 
 db.Categories.hasMany(db.Links);
 db.Links.belongsTo(db.Categories);
 
 let config = {
-  alter : false,
-  force : false,
+  alter : true,
+  force : true,
 }
 
 connection.sync(config)
