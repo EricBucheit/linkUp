@@ -3,7 +3,7 @@ import { FlatList, SafeAreaView, View, StyleSheet, Text, TouchableHighlight, Mod
 import { TextInput } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Swipeout from 'react-native-swipeout';
-
+import axios from 'axios'
 import { Link } from "react-router-native";
 
 import { Icon } from 'react-native-elements'
@@ -64,6 +64,10 @@ const Category = ({ item, onPress, style, setData, data }) => {
            setModalVisible={setShowEditModal}
            modalVisible={showEditModal}
            onSubmit={(value) => {
+              // needs id from the db, local id is not the same right now
+              axios.put('http://192.168.1.3:8080/categories/1', {name: value}).then(res => {
+                console.log(res)
+              })
                 for (let category of data) {
                   if (category.id === item.id) {
                     category.title = value
@@ -117,6 +121,10 @@ const Categories = ({setCurrentCategory, data, setData}) => {
            setModalVisible={setModalVisible}
            modalVisible={modalVisible}
            onSubmit={(value) => {
+              axios.post('http://192.168.1.3:8080/categories', {name: value}).then(res => {
+                console.log(res)
+              })
+
               data.push({
                 id: `${data.length + 1}`,
                 title: value,

@@ -2,16 +2,18 @@
 module.exports = {
 
 	async get(req, res, db) {
+		console.log("GETTING")
 		let categories = await db.Categories.findAll({
 			where: {
 				userId: req.session.user.id,
-				include: db.Links,
+				// include: db.Links,
 			}
-		})
-		if (created) {
-			res.json({message: "CREATE SUCCESS", code: 1, categories: categories});
+		}).catch(err => console.log(err))
+
+		if (categories) {
+			res.json({message: "GET SUCCESS", code: 1, categories: categories});
 		} else {
-			res.json({message: "COULDNT CREATE", code: -1});
+			res.json({message: "Couldnt Get categories", code: -1});
 		}
 	},
 

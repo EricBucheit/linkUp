@@ -4,12 +4,9 @@ module.exports = (app, db) => {
 
 	const routePrefix = '/categories'
 
-	app.get(`${routePrefix}/test`, (req, res) => {
-		Categories.test();
-	})
-
 	app.get(`${routePrefix}`, (req, res) => {
-		Categories.get(req, res, db);
+		console.log("GETTING CATEGORIES")
+		Categories.get(req, res, db).catch(err => console.log(err));
 	})
 
 	app.post(`${routePrefix}`, (req, res) => {

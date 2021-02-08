@@ -6,7 +6,7 @@ import Swipeout from 'react-native-swipeout';
 
 import { NativeRouter, Route, Link } from "react-router-native";
 import RNUrlPreview from 'react-native-url-preview';
-
+import axios from 'axios'
 import { Icon } from 'react-native-elements'
 
 const storeData = async (value) => {
@@ -72,6 +72,11 @@ const UrlLink = ({ item, onPress, style, currentCategory, data, setData }) => {
            <Input
               title={"Edit"}
               onSubmit={(url, name) => {
+                  // needs id and category id probably gonna save userid for authentication
+                   axios.put(`http://192.168.1.3:8080/links/${1}/${3}`, {categoryId: 1, name: name, url: url}).then(res => {
+                    console.log(res)
+                  })
+
                   let links = currentCategory.links;
                   for (let link of links){
                     if (link.id === item.id) {
@@ -126,6 +131,13 @@ const Links = ({currentCategory, setData, data}) => {
            <Input
             title={"New"}
             onSubmit={(url, name) => {
+
+              // needs real category id
+
+               axios.post('http://192.168.1.3:8080/links', {categoryId: 1, name: name, url: url}).then(res => {
+                console.log(res)
+              })
+
               currentCategory.links.push({
                 id: `${currentCategory.links.length + 1}`,
                 name: name,
