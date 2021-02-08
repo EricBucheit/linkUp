@@ -6,4 +6,9 @@ clone
 npm install
 expo start
 
+
+open new terminal
+cd /Server
+nodemon server.js
+
 navigate to expo application and follow directions
