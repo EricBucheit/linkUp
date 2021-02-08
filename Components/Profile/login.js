@@ -30,7 +30,7 @@ const Login = (props) => {
 
       <View>
         <TouchableHighlight
-            // style={{ ...styles.addButton }}
+            style={{ height: 50, backgroundColor: "lightgreen" }}
             onPress={() => {
               axios.post('http://192.168.1.3:8080/users/login', {email: email, password: password}).then(res => {
                 console.log(res.data.message);

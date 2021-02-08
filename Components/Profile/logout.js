@@ -9,9 +9,13 @@ const Logout = (props) => {
 
     <View>
         <TouchableHighlight
+        	style={{
+
+        			height: 50,
+        			backgroundColor: "red"
+        		}}
             onPress={() => {
               axios.post('http://192.168.1.3:8080/users/logout').then(res => {
-                console.log(res.data.message);
                 Alert.alert(res.data.message)
                 setAuth(false)
               }).catch(err => console.log(err))

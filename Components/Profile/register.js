@@ -39,6 +39,7 @@ const Register = (props) => {
 
       <View>
         <TouchableHighlight
+            style={{height: 50, backgroundColor: "lightgreen"}}
             onPress={() => {
               axios.post('http://192.168.1.3:8080/users/register', {email: email, password: password}).then(res => {
                 if (res.data.code === 1) {
