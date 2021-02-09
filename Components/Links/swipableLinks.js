@@ -33,7 +33,7 @@ if (Platform.OS === 'android') {
     UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-class Links extends React.Component {
+class SwipableLinks extends React.Component {
   constructor(props) {
     super();
     this.state = {
@@ -49,6 +49,7 @@ class Links extends React.Component {
     this.setState({modalVisible: visible});
   }
   setShowEditModal = (visible) => {
+    console.log("SETTING")
     this.setState({editModalVisible: visible});
   }
 
@@ -56,7 +57,9 @@ class Links extends React.Component {
   deleteItem = (item: Item) => {
     const updatedData = this.props.currentCategory.links.filter((d) => d.id !== item.id);
 
-    LinkApi.delete(item.id);
+    LinkApi.delete(item.id).then(res => {
+      console.log(res.data.message)
+    })
     // Animate list to close gap when item is deleted
     LayoutAnimation.configureNext(LayoutAnimation.Presets.spring);
     
@@ -99,6 +102,7 @@ class Links extends React.Component {
   );
 
   renderItem = ({ item, index, drag }: RenderItemParams<Item>) => {
+    console.log(item)
     return (
       <SwipeableItem
         key={item.key}
@@ -148,12 +152,16 @@ class Links extends React.Component {
               for (let index in data) {
                 links.push({order_number: index, id: data[index].id})
               }
-              LinkApi.updateOrderNumbers(links).catch(err => {
+              console.log(links)
+              LinkApi.updateOrderNumbers(links).then(res => {
+                Alert.alert(res.data.message);
+              }).catch(err => {
                 console.log(err)
               })
 
               this.props.currentCategory.links = data;
               data = this.props.data.slice();
+              // console.log(data)
               this.props.setData(data)
           }}
           activationDistance={20}
@@ -184,7 +192,11 @@ class Links extends React.Component {
            <Input
               title={"Edit"}
               onSubmit={(url, name) => {
-                  LinkApi.update(this.props.currentCategory.id, this.state.currentLink.id, name, url);
+                  console.log("UPDATING")
+                  LinkApi.update(this.props.currentCategory.id, this.state.currentLink.id, name, url).then(res => {
+                      console.log(res);
+                  })
+
                   let links = this.props.currentCategory.links;
                   for (let link of links){
                     if (link.id === this.state.currentLink.id) {
@@ -281,7 +293,7 @@ const Input = ({onSubmit, title}) => {
 
 
 
-export default Links;
+export default SwipableLinks;
 
 const styles = StyleSheet.create({
   container: {

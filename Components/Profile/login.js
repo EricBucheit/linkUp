@@ -2,10 +2,11 @@ import React, { useState } from "react";
 import { View, Button, Text, TextInput, TouchableHighlight, Alert } from "react-native";
 import axios from 'axios'
 import { Dimensions } from 'react-native';
-
+import Users from '../API/users'
+import CategoryApi from '../API/categories'
 
 const Login = (props) => {
-  let {setAuth} = props;
+  let {setAuth, setData} = props;
   let [email, setEmail] = React.useState('bucheiteric@gmail.com');
   let [password, setPassword] = React.useState('Testing1212!@');
 
@@ -31,14 +32,15 @@ const Login = (props) => {
       <View>
         <TouchableHighlight
             style={{ height: 50, backgroundColor: "lightgreen" }}
-            onPress={() => {
-              axios.post('http://192.168.1.3:8080/users/login', {email: email, password: password}).then(res => {
-                console.log(res.data.message);
-                if (res.data.code === 1) {
-                  setAuth(true)
-                }
-                Alert.alert(res.data.message)
-              }).catch(err => console.log(err))
+            onPress={async () => {
+              
+              let res = await Users.login(email, password);
+              if (res.data.code === 1) {
+                let res = await CategoryApi.get().catch(err => console.log(err))
+                setData(res.data.categories);
+                setAuth(true)
+              }
+              Alert.alert(res.data.message)
             }}
 
         >

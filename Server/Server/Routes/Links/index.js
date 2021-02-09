@@ -5,7 +5,6 @@ module.exports = (app, db) => {
 	const routePrefix = '/links'
 
 	app.get(`${routePrefix}`, (req, res) => {
-		console.log("GETTING Links")
 		Links.get(req, res, db).catch(err => console.log(err));
 	})
 
@@ -13,7 +12,7 @@ module.exports = (app, db) => {
 		Links.post(req, res, db);
 	})
 
-	app.put(`${routePrefix}/:categoryId/:id`, (req, res) => {
+	app.put(`${routePrefix}/:categoryId`, (req, res) => {
 		Links.put(req, res, db);
 	})
 
@@ -21,5 +20,7 @@ module.exports = (app, db) => {
 		Links.delete(req, res, db);
 	})
 	
-
+	app.put(`${routePrefix}/update/order_numbers`, (req, res) => {
+		Links.updateOrderNumbers(req, res, db);
+	})
 }

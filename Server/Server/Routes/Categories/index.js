@@ -5,7 +5,6 @@ module.exports = (app, db) => {
 	const routePrefix = '/categories'
 
 	app.get(`${routePrefix}`, (req, res) => {
-		console.log("GETTING CATEGORIES")
 		Categories.get(req, res, db).catch(err => console.log(err));
 	})
 
@@ -18,7 +17,6 @@ module.exports = (app, db) => {
 	})
 
 	app.delete(`${routePrefix}/:id`, (req, res) => {
-		console.log(req.params.id)
 		Categories.delete(req, res, db);
 	})
 

@@ -9,7 +9,7 @@ import UserProfile from './profile'
 
 
 const Profile = (props) => {
-  let {setAuth, auth} = props;
+  let {setAuth, auth, setData} = props;
   let [page, setPage] = React.useState("login");
   
   return (
@@ -22,7 +22,7 @@ const Profile = (props) => {
               color="#841584"
               accessibilityLabel="Click Here to Register"
             />
-            <Login setAuth={setAuth} />
+            <Login setAuth={setAuth} setData={setData}/>
           </View>
         }
       {page === "register" && !auth && 
@@ -39,7 +39,7 @@ const Profile = (props) => {
       {auth === true && 
        <UserProfile />
       }
-      <Logout setAuth={setAuth} />
+      <Logout setAuth={setAuth} setData={setData} />
     </View>
 
   )

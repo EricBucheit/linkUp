@@ -13,6 +13,11 @@ import Links from './Components/Links'
 import Categories from './Components/Categories'
 import axios from 'axios'
 import Profile from './Components/Profile'
+import {api_url} from './Config';
+
+import Users from './Components/API/users'
+import CategoryApi from './Components/API/categories'
+
 
 const storeData = async (value) => {
   try {
@@ -37,7 +42,6 @@ const removeItemValue = async (key) => {
 const getData = async () => {
   try {
     const jsonValue = await AsyncStorage.getItem('linkData')
-    console.log(jsonValue)
     return jsonValue != null ? JSON.parse(jsonValue) : [];
   } catch(e) {
     // error reading value
@@ -51,17 +55,15 @@ let [currentCategory, setCurrentCategory] = React.useState({})
 let [data, setData] = React.useState([]);
 let [auth, setAuth] = React.useState(false);
 
-React.useEffect(async () => {
+React.useEffect(() => {
     async function fetchData() {
-      await removeItemValue('linkData')
-      let data = await getData()
+      // await removeItemValue('linkData')
+      // let data = await getData()
 
-      let user = await axios.get('http://192.168.1.3:8080/users/user').catch(err => console.log(err))
+      let user = await Users.getCurrent();
       if (user.data.code === 1) setAuth(true);
-
-      let res = await axios.get('http://192.168.1.3:8080/categories').catch(err => console.log(err))
+      let res = await CategoryApi.get().catch(err => console.log(err))
       setData(res.data.categories);
-      console.log(res.data.categories)
   }
 
   fetchData();
@@ -87,7 +89,7 @@ return (
           <Text>Links</Text>
         </Link>
       </View>
-      <Route exact path="/" component={() => <Profile setAuth={setAuth} auth={auth} />} />
+      <Route exact path="/" component={() => <Profile setAuth={setAuth} auth={auth} setData={setData}/>} />
       <Route exact path="/categories" component={() => {
           if (!auth) {
             return (<Redirect

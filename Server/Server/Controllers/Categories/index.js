@@ -7,7 +7,7 @@ module.exports = {
 				userId: req.session.user.id,
 			},
 			order: [['order_number', 'asc']],
-			include: db.Links,
+			include: {model: db.Links, separate: true, order: [['order_number', 'asc']]}
 		}).catch(err => console.log(err))
 
 		if (categories) {
@@ -18,9 +18,9 @@ module.exports = {
 	},
 
 	async post(req, res, db) {
-		let created = await db.Categories.create({name: req.body.name, userId: req.session.user.id})
-		if (created) {
-			res.json({message: "CREATE SUCCESS", code: 1});
+		let newCategory = await db.Categories.create({name: req.body.name, userId: req.session.user.id})
+		if (newCategory) {
+			res.json({message: "CREATE SUCCESS", code: 1, category: newCategory});
 		} else {
 			res.json({message: "COULDNT CREATE", code: -1});
 		}

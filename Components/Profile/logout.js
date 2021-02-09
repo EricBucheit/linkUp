@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { View, Button, Text, TextInput, TouchableHighlight, Alert } from "react-native";
-import axios from 'axios'
+import Users from '../API/users'
 
 
 const Logout = (props) => {
-  let {setAuth} = props
+  let {setAuth, setData} = props
   return (
 
     <View>
@@ -14,11 +14,11 @@ const Logout = (props) => {
         			height: 50,
         			backgroundColor: "red"
         		}}
-            onPress={() => {
-              axios.post('http://192.168.1.3:8080/users/logout').then(res => {
+            onPress={async () => {
+                let res = await Users.logout()
+                setData([])
                 Alert.alert(res.data.message)
                 setAuth(false)
-              }).catch(err => console.log(err))
             }}
 
         >

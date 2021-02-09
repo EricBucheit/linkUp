@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View, Button, Text, TextInput, TouchableHighlight, Alert } from "react-native";
-import axios from 'axios'
 import { Dimensions } from 'react-native';
+import Users from '../API/users'
 
 const Register = (props) => {
   let {setAuth} = props
@@ -40,14 +40,12 @@ const Register = (props) => {
       <View>
         <TouchableHighlight
             style={{height: 50, backgroundColor: "lightgreen"}}
-            onPress={() => {
-              axios.post('http://192.168.1.3:8080/users/register', {email: email, password: password}).then(res => {
-                if (res.data.code === 1) {
-                  setAuth(true)
-                }
-                Alert.alert(res.data.message)
-                console.log(res.data.message);
-              }).catch(err => console.log(err))
+            onPress={async () => {
+              let res = await Users.register(email, password);
+              if (res.data.code === 1) {
+                setAuth(true)
+              }
+              Alert.alert(res.data.message)
             }}
         >
             <Text>Register</Text>
