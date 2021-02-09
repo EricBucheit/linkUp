@@ -133,8 +133,7 @@ const Links = ({currentCategory, setData, data}) => {
             onSubmit={(url, name) => {
 
               // needs real category id
-
-               axios.post('http://192.168.1.3:8080/links', {categoryId: 1, name: name, url: url}).then(res => {
+               axios.post('http://192.168.1.3:8080/links', {categoryId: currentCategory.id, name: name, url: url}).then(res => {
                 console.log(res)
               })
 
@@ -143,6 +142,7 @@ const Links = ({currentCategory, setData, data}) => {
                 name: name,
                 url: url,
               })
+              
               data = data.slice();
               setData(data);
               storeData(data);

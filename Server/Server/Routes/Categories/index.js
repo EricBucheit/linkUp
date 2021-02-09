@@ -18,7 +18,12 @@ module.exports = (app, db) => {
 	})
 
 	app.delete(`${routePrefix}/:id`, (req, res) => {
+		console.log(req.params.id)
 		Categories.delete(req, res, db);
+	})
+
+	app.put(`${routePrefix}/update/order_numbers`, (req, res) => {
+		Categories.updateOrderNumbers(req, res, db);
 	})
 	
 

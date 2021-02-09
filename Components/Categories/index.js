@@ -1,129 +1,177 @@
-import React, { useState } from "react";
-import { FlatList, SafeAreaView, View, StyleSheet, Text, TouchableHighlight, Modal } from "react-native";
-import { TextInput } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import Swipeout from 'react-native-swipeout';
+import React from 'react';
+import {
+  Text,
+  View,
+  StyleSheet,
+  FlatList,
+  LayoutAnimation,
+  TouchableOpacity,
+  Platform,
+  UIManager,
+  Modal,
+  TouchableHighlight,
+  TextInput,
+  SafeAreaView,
+  Alert,
+
+} from 'react-native';
+import { Icon } from 'react-native-elements'
 import axios from 'axios'
+import Animated from 'react-native-reanimated';
+import SwipeableItem, { UnderlayParams } from 'react-native-swipeable-item';
+import DraggableFlatList, {
+  RenderItemParams,
+} from 'react-native-draggable-flatlist';
 import { Link } from "react-router-native";
 
-import { Icon } from 'react-native-elements'
-// import { Dimensions } from 'react-native';
+const { multiply, sub } = Animated;
 
-const storeData = async (value) => {
-  try {
-    const jsonValue = JSON.stringify(value)
-    await AsyncStorage.setItem('linkData', jsonValue)
-  } catch (e) {
-    // saving error
-  }
+if (Platform.OS === 'android') {
+  UIManager.setLayoutAnimationEnabledExperimental &&
+    UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-const Category = ({ item, onPress, style, setData, data }) => {
-  const [showEditModal, setShowEditModal] = React.useState(false);
-  var swipeoutBtns = [
-    {
-      text: 'Edit',
-      color: "black",
-      backgroundColor: "yellow",
-      onPress: function() {
-        setShowEditModal(true)
-      },
-    },
-    {
-      text: 'Delete',
-      color: "black",
-      backgroundColor: "red",
-      onPress: function() {
-        for(let category in data) {
-          if (data[category].id === item.id) {
-            data.splice(category, 1);
-            data = data.slice();
-            setData(data);
-            storeData(data);
+class Categories extends React.Component {
+  constructor(props) {
+    super();
+    this.state = {
+      modalVisible: false,
+      editModalVisible: false,
+      currentCategory: false,
+    };
+  }
 
+
+  itemRefs = new Map();
+
+  setModalVisible = (visible) => {
+    this.setState({modalVisible: visible});
+  }
+  setShowEditModal = (visible) => {
+    console.log("SETTING")
+    this.setState({editModalVisible: visible});
+  }
+
+
+  deleteItem = (item: Item) => {
+    const updatedData = this.props.data.filter((d) => d !== item);
+    const deleteItem = this.props.data.filter((d) => d === item);
+
+    console.log(deleteItem)
+    axios.delete(`http://192.168.1.3:8080/categories/${deleteItem[0].id}`).then(res => {
+      console.log(res.data.message)
+    })
+    // Animate list to close gap when item is deleted
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.spring);
+    this.props.setData(updatedData);
+  };
+
+  renderUnderlayLeft = ({ item, percentOpen }: UnderlayParams<Item>) => (
+    <Animated.View
+      style={[styles.row, styles.underlayLeft, { opacity: percentOpen }]} // Fade in on open
+    >
+      <TouchableOpacity onPressOut={() => this.deleteItem(item)}>
+        <Text style={styles.text}>{`Delete`}</Text>
+      </TouchableOpacity>
+    </Animated.View>
+  );
+
+  renderUnderlayRight = ({
+    item,
+    percentOpen,
+    open,
+    close,
+  }: UnderlayParams<Item>) => (
+    <Animated.View
+      style={[
+        styles.row,
+        styles.underlayRight,
+        {
+          transform: [{ translateX: multiply(sub(1, percentOpen), -100) }], // Translate from left on open
+        },
+      ]}>
+      <TouchableOpacity onPressOut={close} onPress={() => {
+        this.setState({currentCategory: item});
+        this.setShowEditModal(true)
+      }}>
+        <Text style={styles.text}>Edit</Text>
+      </TouchableOpacity>
+    </Animated.View>
+  );
+
+  renderItem = ({ item, index, drag }: RenderItemParams<Item>) => {
+    return (
+      <SwipeableItem
+        key={item.key}
+        item={item}
+        ref={(ref) => {
+          if (ref && !this.itemRefs.get(item.key)) {
+            this.itemRefs.set(item.key, ref);
           }
-        }
-      }
-    }
-  ]
-  return (
-    <Swipeout style={{backgroundColor: "white", borderWidth:1, borderColor: "grey", borderRadius: 10}} right={swipeoutBtns}>
-      <View>
-         <Link
+        }}
+        onChange={({ open }) => {
+          if (open) {
+            // Close all other open items
+            [...this.itemRefs.entries()].forEach(([key, ref]) => {
+              if (key !== item.key && ref) ref.close();
+            });
+          }
+        }}
+        overSwipe={20}
+        renderUnderlayLeft={this.renderUnderlayLeft}
+        renderUnderlayRight={this.renderUnderlayRight}
+        snapPointsLeft={[100]}
+        snapPointsRight={[100]}>
+        <View
+          style={[
+            styles.row,
+            { backgroundColor: "white",borderWidth: 1, borderColor: "black", height: 100 },
+          ]}>
+          <Link
           to="/link"
           underlayColor="#f0f4f7"
-          style={[styles.item, style]}
-          onPress={onPress}
+          style={[styles.item]}
+          onPress={()=> {this.props.setCurrentCategory(item)}}
+          onLongPress={drag}
         >
         <View style={{flexDirection: "row", justifyContent: "center"}}>
           <Text style={[styles.title, {justifyContent: "flex-start"}]}>{item.name}</Text>
         </View>
         </Link>
-        <AModal modalVisible={showEditModal} setModalVisible={setShowEditModal} showButton={false}>
-          <Input 
-           setModalVisible={setShowEditModal}
-           modalVisible={showEditModal}
-           onSubmit={(value) => {
-              // needs id from the db, local id is not the same right now
-              axios.put('http://192.168.1.3:8080/categories/1', {name: value}).then(res => {
-                console.log(res)
-              })
-                for (let category of data) {
-                  if (category.id === item.id) {
-                    category.name = value
-                    break ;
-                  }
-                }
-
-                data = data.slice();
-                setData(data);
-                storeData(data);
-                setShowEditModal(false);
-            }}
-            
-        />
-        </AModal>
-      </View>
-    </Swipeout>
-   
-  )
-}
-
-
-const Categories = ({setCurrentCategory, data, setData}) => {
-  const [modalVisible, setModalVisible] = React.useState(false);
-
-  const renderItem = ({ item }) => {
-    const backgroundColor = "white";
-    return (
-      <Category
-        item={item}
-        onPress={() => {
-          setCurrentCategory(item)
-        }}
-        data={data}
-        setData={setData}
-        style={{ backgroundColor }}
-      />
+        </View>
+      </SwipeableItem>
     );
   };
 
-  return (
-    <SafeAreaView style={styles.container}>
-      <FlatList
-        data={data}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-      />
-
-      <AModal modalVisible={modalVisible} setModalVisible={setModalVisible} showButton={true}>
+  render() {
+    return (
+      <SafeAreaView style={styles.container}>
+        <DraggableFlatList
+          keyExtractor={(item) => item.id.toString()}
+          data={this.props.data}
+          renderItem={this.renderItem}
+          onDragEnd={({ data }) => {
+              let categories = [];
+              for (let index in data) {
+                categories.push({order_number: index, id: data[index].id})
+              }
+              axios.put('http://192.168.1.3:8080/categories/update/order_numbers', categories).then(res => {
+                Alert.alert(res.data.message)
+              })
+              this.props.setData(data)
+          }}
+          activationDistance={20}
+        />
+        <AModal modalVisible={this.state.modalVisible} setModalVisible={this.setModalVisible} showButton={true}>
          <Input
-           setModalVisible={setModalVisible}
-           modalVisible={modalVisible}
+           setModalVisible={this.setModalVisible}
+           modalVisible={this.state.modalVisible}
            onSubmit={(value) => {
               axios.post('http://192.168.1.3:8080/categories', {name: value}).then(res => {
                 console.log(res)
               })
+
+              let data = this.props.data.slice();
 
               data.push({
                 id: `${data.length + 1}`,
@@ -131,16 +179,42 @@ const Categories = ({setCurrentCategory, data, setData}) => {
                 links: [],
               })
               data = data.slice();
-              setData(data);
-              storeData(data);
-              setModalVisible(false);
+              this.props.setData(data);
+              // this.props.storeData(data);
+              this.setModalVisible(false);
             }}
         />
       </AModal>
-    </SafeAreaView>
-  );
-};
+      <AModal modalVisible={this.state.editModalVisible} setModalVisible={this.setShowEditModal} showButton={false}>
+          <Input 
+           setModalVisible={this.setShowEditModal}
+           modalVisible={this.state.editModalVisible}
+           onSubmit={(value) => {
+              // needs id from the db, local id is not the same right now
+              axios.put(`http://192.168.1.3:8080/categories/${this.state.currentCategory.id}`, {name: value}).then(res => {
+                console.log(res)
+              })
 
+              let data = this.props.data.slice();
+                for (let category of data) {
+                  if (category.id === this.state.currentCategory.id) {
+                    category.name = value
+                    break ;
+                  }
+                }
+
+                data = data.slice();
+                this.props.setData(data);
+                // storeData(data);
+                this.setShowEditModal(false);
+            }}
+            
+        />
+        </AModal>
+      </SafeAreaView>
+    );
+  }
+}
 
 const AModal = ({modalVisible, setModalVisible, showButton, children}) => {
   return (
@@ -208,20 +282,42 @@ const Input = ({onSubmit, setModalVisible, modalVisible}) => {
   );
 }
 
+
+
+export default Categories;
+
 const styles = StyleSheet.create({
   container: {
-    marginTop: 25,
-    padding: 10,
     flex: 1,
   },
-  item: {
-    padding: 20,
-    marginVertical: 8,
-    marginHorizontal: 16,
-    borderRadius: 5,
+  row: {
+    flexDirection: 'row',
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 20,
   },
-  
-  title: {
+  text: {
+    fontWeight: 'bold',
+    color: 'black',
+    fontSize: 16,
+  },
+  underlayRight: {
+    flex: 1,
+    backgroundColor: 'yellow',
+    color: "black",
+    justifyContent: 'flex-start',
+    // borderRadius: 10,
+  },
+  underlayLeft: {
+    flex: 1,
+    backgroundColor: 'red',
+    justifyContent: 'flex-end',
+    // borderRadius: 10,
+  },
+    title: {
     fontSize: 20,
   },
   centeredView: {
@@ -285,5 +381,3 @@ const styles = StyleSheet.create({
     textAlign: "center"
   },
 });
-
-export default Categories

@@ -53,14 +53,15 @@ let [auth, setAuth] = React.useState(false);
 
 React.useEffect(async () => {
     async function fetchData() {
-      // await removeItemValue('linkData')
+      await removeItemValue('linkData')
       let data = await getData()
+
       let user = await axios.get('http://192.168.1.3:8080/users/user').catch(err => console.log(err))
-      // need to fix this
-      let res = await axios.get('http://192.168.1.3:8080/categories').catch(err => console.log(err))
-     
       if (user.data.code === 1) setAuth(true);
+
+      let res = await axios.get('http://192.168.1.3:8080/categories').catch(err => console.log(err))
       setData(res.data.categories);
+      console.log(res.data.categories)
   }
 
   fetchData();

@@ -2,12 +2,11 @@
 module.exports = {
 
 	async get(req, res, db) {
-		console.log("GETTING")
-		console.log(db)
 		let categories = await db.Categories.findAll({
 			where: {
 				userId: req.session.user.id,
 			},
+			order: [['order_number', 'asc']],
 			include: db.Links,
 		}).catch(err => console.log(err))
 
@@ -45,12 +44,27 @@ module.exports = {
 
 	},
 
-	delete(req, res, db) {
-		db.Categories.delete({
+	async delete(req, res, db) {
+		await db.Categories.destroy({
 			where: {
 				userId: req.session.user.id,
 				id: req.params.id,
 			}
 		})
+		res.json({code: 1, message: "deletion Successful"})
+	},
+
+	async updateOrderNumbers(req, res, db) {
+		for (category of req.body) {
+			let found = await db.Categories.findOne({
+				where: {
+					userId: req.session.user.id,
+					id: category.id,
+				}
+			})
+			await found.update({order_number: category.order_number}) 
+		}
+
+		res.json({code: 1, message: "Update Success"});
 	},
 }

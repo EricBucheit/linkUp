@@ -36,8 +36,8 @@ db.Categories.hasMany(db.Links);
 db.Links.belongsTo(db.Categories);
 
 let config = {
-  alter : true,
-  force : true,
+  alter : false,
+  force : false,
 }
 
 connection.sync(config)
