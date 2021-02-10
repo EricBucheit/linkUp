@@ -11,6 +11,9 @@ import RNUrlPreview from 'react-native-url-preview';
 import { Icon } from 'react-native-elements'
 import Links from './Components/Links'
 import Categories from './Components/Categories'
+import Search from './Components/Search'
+
+
 import axios from 'axios'
 import Profile from './Components/Profile'
 import {api_url} from './Config';
@@ -88,6 +91,13 @@ return (
         >
           <Text>Links</Text>
         </Link>
+        <Link
+          to="/search"
+          underlayColor="#f0f4f7"
+          style={styles.navItem}
+        >
+          <Text>Search</Text>
+        </Link>
       </View>
       <Route exact path="/" component={() => <Profile setAuth={setAuth} auth={auth} setData={setData}/>} />
       <Route exact path="/categories" component={() => {
@@ -111,6 +121,18 @@ return (
             />)
           }
           return (<Links data={data} setData={setData} setCurrentCategory={setCurrentCategory} currentCategory={currentCategory}/>)
+        }} 
+      />
+      <Route path="/search" 
+        component={() => {
+          if (!auth) {
+            return (<Redirect
+              to={{
+                pathname: "/",
+              }}
+            />)
+          }
+          return (<Search />)
         }} 
       />
     </View>

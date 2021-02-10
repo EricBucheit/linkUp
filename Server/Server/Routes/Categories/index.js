@@ -24,5 +24,9 @@ module.exports = (app, db) => {
 		Categories.updateOrderNumbers(req, res, db);
 	})
 	
+	app.get(`${routePrefix}/search/:search`, (req, res) => {
+		Categories.search(req, res, db);
+	})
+	
 
 }

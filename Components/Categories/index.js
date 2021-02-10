@@ -13,7 +13,6 @@
       TextInput,
       SafeAreaView,
       Alert,
-
     } from 'react-native';
     import { Icon } from 'react-native-elements'
     import Animated from 'react-native-reanimated';
@@ -23,7 +22,7 @@
     } from 'react-native-draggable-flatlist';
     import { Link } from "react-router-native";
     import CategoryApi from '../API/categories'
-
+    import { List } from 'react-native-paper';
 
     const { multiply, sub } = Animated;
 
@@ -116,7 +115,6 @@
                     }
                 }}
             >
-                <View style={styles.row}>
                     <Link
                         to="/link"
                         underlayColor="#f0f4f7"
@@ -124,11 +122,13 @@
                         onPress={()=> {this.props.setCurrentCategory(item)}}
                         onLongPress={drag}
                     >
-                        <View style={{flexDirection: "row", justifyContent: "center"}}>
-                            <Text style={[styles.title, {justifyContent: "flex-start"}]}>{item.name}</Text>
-                        </View>
-                    </Link>
-                </View>
+                    <View style={styles.row}>
+                            <View>
+                                <Text style={[styles.title], {marginBottom: 10, fontSize: 20}}>{item.name} <Text style={{fontSize: 10}}>({item.links.length} links)</Text></Text>
+                                <Text style={[styles.title], {justifyContent: 'flex-end'}}>{item.description}</Text>
+                            </View>
+                    </View>
+                </Link>
             </SwipeableItem>
         );
       };
@@ -158,8 +158,8 @@
             <Input
                 setModalVisible={this.setModalVisible}
                 modalVisible={this.state.modalVisible}
-                onSubmit={async (value) => {
-                    let res = await CategoryApi.create(value)
+                onSubmit={async (name, description) => {
+                    let res = await CategoryApi.create(name, description)
                     let data = this.props.data.slice();
 
                     data.push({
@@ -245,20 +245,27 @@
     };
 
     const Input = ({onSubmit, setModalVisible, modalVisible}) => {
-      const [value, onChangeText] = React.useState('');
+      const [name, setName] = React.useState('');
+      const [description, setDescription] = React.useState('');
       return (
         <View>
         <Text>Category Name</Text>
         <TextInput
           style={{ height: 50, width: 300, borderColor: 'gray', borderWidth: 1, marginBottom: 20}}
-          onChangeText={text => onChangeText(text)}
-          value={value}
+          onChangeText={text => setName(text)}
+          value={name}
+        />
+        <Text>Description</Text>
+        <TextInput
+          style={{ height: 50, width: 300, borderColor: 'gray', borderWidth: 1, marginBottom: 20}}
+          onChangeText={text => setDescription(text)}
+          value={description}
         />
 
          <View style={styles.modalButtonWrapper}>
             <TouchableHighlight
                 style={{ ...styles.addButton }}
-                onPress={() => onSubmit(value)}
+                onPress={() => onSubmit(name, description)}
             >
                 <Text style={styles.textStyle}>Add</Text>
             </TouchableHighlight>
@@ -279,13 +286,10 @@
       row: {
         flexDirection: 'row',
         flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
         padding: 15,
-        borderRadius: 10,
         marginBottom: 20,
         backgroundColor: "white",
-        borderWidth: 1, 
+        borderBottomWidth: 1, 
         borderColor: "black", 
         height: 100,
       },

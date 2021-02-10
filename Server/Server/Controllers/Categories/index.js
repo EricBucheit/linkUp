@@ -1,4 +1,5 @@
-// this is just a mock template, unused
+const { Op } = require("sequelize");
+
 module.exports = {
 
 	async get(req, res, db) {
@@ -18,7 +19,7 @@ module.exports = {
 	},
 
 	async post(req, res, db) {
-		let newCategory = await db.Categories.create({name: req.body.name, userId: req.session.user.id})
+		let newCategory = await db.Categories.create({name: req.body.name, description: req.body.description, userId: req.session.user.id})
 		if (newCategory) {
 			res.json({message: "CREATE SUCCESS", code: 1, category: newCategory});
 		} else {
@@ -67,4 +68,31 @@ module.exports = {
 
 		res.json({code: 1, message: "Update Success"});
 	},
+
+	async search(req, res, db) {
+		let {search} = req.params
+		var options = {
+		  where: {
+		    name: { [Op.iLike]: '%' + search + '%' },
+		  },
+		  include: [{ model: db.Links }]
+		};
+
+
+		let result = await db.Categories.findAll(options)
+		console.log(result)
+		if (result) {
+			res.json({code: 1, message: "Find Success", search: result});
+		} else {
+			res.json({code: -1, message: "No Results"});
+		}
+	},
 }
+
+
+
+
+
+
+
+

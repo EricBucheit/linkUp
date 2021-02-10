@@ -8,7 +8,6 @@ let CategoryApi = {
 		return res
 	},
 
-
 	async delete(id) {
 		let res = await axios.delete(`${api_url}/categories/${id}`);
 		return res
@@ -19,8 +18,8 @@ let CategoryApi = {
 		return res 
 	},
 
-	async create(value) {
-		let res = await axios.post(`${api_url}/categories`, {name: value})
+	async create(name, description) {
+		let res = await axios.post(`${api_url}/categories`, {name: name, description: description})
 		return res
 	},
 
@@ -28,6 +27,11 @@ let CategoryApi = {
 		let res = await axios.put(`${api_url}/categories/update/order_numbers`, categories);
 		return res;
 	},
+
+	async find(search) {
+		let res = await axios.get(`${api_url}/categories/search/${search}`);
+		return res;
+	}
 }
 
 export default CategoryApi
