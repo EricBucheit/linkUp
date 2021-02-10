@@ -165,6 +165,7 @@
                     data.push({
                         id: `${res.data.category.id}`,
                         name: res.data.category.name,
+                        description: res.data.category.description,
                         links: [],
                     })
                     data = data.slice();
