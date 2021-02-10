@@ -14,7 +14,7 @@ import {
   SafeAreaView,
   Alert,
   Button,
-
+  Linking,
 } from 'react-native';
 import { Icon } from 'react-native-elements'
 import Animated from 'react-native-reanimated';
@@ -25,12 +25,46 @@ import DraggableFlatList, {
 import { Link } from "react-router-native";
 import RNUrlPreview from 'react-native-url-preview';
 import LinkApi from '../API/links';
-
+import { List } from 'react-native-paper'; 
 const { multiply, sub } = Animated;
 
 if (Platform.OS === 'android') {
   UIManager.setLayoutAnimationEnabledExperimental &&
     UIManager.setLayoutAnimationEnabledExperimental(true);
+}
+
+function LinkView({item, drag}) {
+  let [error, setError] = React.useState(false)
+
+  if (error) {
+    return (
+      <View
+        style={[
+          { backgroundColor: "#efeff4", height: 125, marginBottom: 15 },
+        ]}>
+            <List.Item
+                title={item.name}
+                description={`${item.url}`}
+                left={props => <List.Icon {...props} icon="folder" />}
+                onPress={ ()=>{ Linking.openURL(item.url)}}
+                onLongPress={drag}
+             />
+      </View>
+    )
+  }
+  return (<View
+    style={[
+      { backgroundColor: "white", height: 125 },
+    ]}>
+    <RNUrlPreview 
+      drag={drag} 
+      descriptionStyle={{color:"black"}} 
+      titleStyle={{fontSize:20, color:"black"}} 
+      text={`${item.name} , ${item.url}`}
+      onError={() => {
+        setError(true);
+      }}/>
+  </View>)
 }
 
 class Links extends React.Component {
@@ -121,15 +155,7 @@ class Links extends React.Component {
         renderUnderlayRight={this.renderUnderlayRight}
         snapPointsLeft={[100]}
         snapPointsRight={[100]}>
-        <View
-          style={[
-            styles.row,
-            { backgroundColor: "white",borderWidth: 1, borderColor: "black", height: 100 },
-          ]}>
-              <RNUrlPreview drag={drag} descriptionStyle={{color:"white"}} titleStyle={{fontSize:20, color:"black"}} text={`${item.name} , ${item.url}`}/>
-            
-      
-        </View>
+        <LinkView item={item} drag={drag} />
       </SwipeableItem>
     );
   };
@@ -295,6 +321,7 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 10,
     marginBottom: 20,
+    height: 125,
   },
   text: {
     fontWeight: 'bold',
@@ -303,14 +330,18 @@ const styles = StyleSheet.create({
   },
   underlayRight: {
     flex: 1,
-    backgroundColor: 'yellow',
+    // backgroundColor: 'yellow',
+    height: 100,
     color: "black",
     justifyContent: 'flex-start',
+    backgroundColor: "#efeff4", 
+    opacity: 0.90
     // borderRadius: 10,
   },
   underlayLeft: {
     flex: 1,
-    backgroundColor: 'red',
+    backgroundColor: "#efeff4", 
+    opacity: 0.90,
     justifyContent: 'flex-end',
     // borderRadius: 10,
   },

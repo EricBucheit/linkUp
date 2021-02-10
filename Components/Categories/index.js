@@ -123,10 +123,10 @@
                         onLongPress={drag}
                     >
                     <View style={styles.row}>
-                            <View>
-                                <Text style={[styles.title], {marginBottom: 10, fontSize: 20}}>{item.name} <Text style={{fontSize: 10}}>({item.links.length} links)</Text></Text>
-                                <Text style={[styles.title], {justifyContent: 'flex-end'}}>{item.description}</Text>
-                            </View>
+                      <View>
+                          <Text style={[styles.title], {marginBottom: 10, fontSize: 20}}>{item.name} <Text style={{fontSize: 10}}>({item.links.length} links)</Text></Text>
+                          <Text style={[styles.title], {justifyContent: 'flex-end'}}>{item.description}</Text>
+                      </View>
                     </View>
                 </Link>
             </SwipeableItem>
