@@ -21,6 +21,11 @@ let Users = {
 		let user = axios.post(`${api_url}/users/register`, {email: email, password: password}).catch(err => console.log(err))
 		return user;
 	},
+	async search(email) {
+		console.log(email)
+		let user = axios.get(`${api_url}/users/search/${email}`).catch(err => console.log(err))
+		return user;
+	},
 
 }
 

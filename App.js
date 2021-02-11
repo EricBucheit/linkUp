@@ -85,13 +85,6 @@ return (
           <Text>Categories</Text>
         </Link>
         <Link
-          to="/link"
-          underlayColor="#f0f4f7"
-          style={styles.navItem}
-        >
-          <Text>Links</Text>
-        </Link>
-        <Link
           to="/search"
           underlayColor="#f0f4f7"
           style={styles.navItem}

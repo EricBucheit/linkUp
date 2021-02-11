@@ -22,6 +22,12 @@ let LinkApi = {
 		let res = await axios.put(`${api_url}/links/update/order_numbers`, links).catch(err => console.log(err))
 		return res
 	},
+
+	async search(text) {
+		console.log(text)
+		let user = axios.get(`${api_url}/links/search/${text}`).catch(err => console.log(err))
+		return user;
+	},
 }
 
 

@@ -130,7 +130,27 @@ module.exports = {
 	},
 
 
+	async search(req, res, db) {
+		let {search} = req.params
+		var options = {
+		  where: {
+		    email: { [Op.iLike]: '%' + search + '%' },
+		  },
+		  include: {
+		  	model: db.Categories,
+		  	include: db.Links,
+		  },
+		  attributes: ['email', 'id']
+		};
 
+
+		let result = await db.Users.findAll(options)
+		if (result) {
+			res.json({code: 1, message: "Find Success", search: result});
+		} else {
+			res.json({code: -1, message: "No Results", search: []});
+		}
+	},
 
 	
 }

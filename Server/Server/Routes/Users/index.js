@@ -19,6 +19,10 @@ module.exports = (app, db) => {
 	app.get(`${routePrefix}/user`, (req, res) => {
 		Users.getUser(req, res, db);
 	})
+
+	app.get(`${routePrefix}/search/:search`, (req, res) => {
+		Users.search(req, res, db);
+	})
 	
 
 }

@@ -23,4 +23,9 @@ module.exports = (app, db) => {
 	app.put(`${routePrefix}/update/order_numbers`, (req, res) => {
 		Links.updateOrderNumbers(req, res, db);
 	})
+
+	app.get(`${routePrefix}/search/:search`, (req, res) => {
+		Links.search(req, res, db);
+	})
+	
 }

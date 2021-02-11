@@ -33,6 +33,15 @@ if (Platform.OS === 'android') {
     UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
+function formatUrl(url) {
+
+  url = url.replace(/^https?\:\/\//i, "");
+  url = url.replace(/^ftp?\:\/\//i, "");
+  url = `https://${url}`;
+  return url
+}
+
+
 function LinkView({item, drag}) {
   let [error, setError] = React.useState(false)
 
@@ -189,7 +198,10 @@ class Links extends React.Component {
           <Input
              title={"New"}
              onSubmit={async (url, name) => {
-                let res = await LinkApi.create(this.props.currentCategory.id, name, url)
+
+
+              url = formatUrl(url);
+              let res = await LinkApi.create(this.props.currentCategory.id, name, url)
 
                this.props.currentCategory.links.push({
                  id: res.data.link.id,
@@ -277,7 +289,7 @@ const LinkModal = ({currentCategory, setModalVisible, modalVisible, children, sh
 
 
 const Input = ({onSubmit, title}) => {
-  const [url, setUrl] = React.useState('https://');
+  const [url, setUrl] = React.useState('');
   const [name, setName] = React.useState('');
   return (
     <View>

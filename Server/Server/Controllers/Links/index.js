@@ -1,4 +1,4 @@
-// this is just a mock template, unused
+const { Op } = require("sequelize");
 
 module.exports = {
 	async get(req, res, db) {
@@ -64,6 +64,25 @@ module.exports = {
 		}
 
 		res.json({code: 1, message: "Update Success"});
+	},
+
+	async search(req, res, db) {
+		let {search} = req.params
+		var options = {
+		  where: {
+		  	 [Op.or]: [
+		      { 'name': { [Op.iLike]: '%' + search + '%' } },
+		      { 'url': { [Op.iLike]: '%' + search + '%' } }
+		    ]
+		  },
+		  attributes: ['url', 'name', "id"]
+		};
+		let result = await db.Links.findAll(options).catch(err => console.log(err))
+		if (result) {
+			res.json({code: 1, message: "Find Success", search: result});
+		} else {
+			res.json({code: -1, message: "No Results", search: []});
+		}
 	},
 
 }
